@@ -1,0 +1,13 @@
+
+---
+
+#### 6. **Создание репозитория на GitHub**
+1. Создайте новый репозиторий на GitHub.
+2. Инициализируйте локальный репозиторий:
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit"
+   git branch -M main
+   git remote add origin https://github.com/ваш_username/название_репозитория.git
+   git push -u origin main
