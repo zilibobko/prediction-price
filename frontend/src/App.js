@@ -27,12 +27,13 @@ function App() {
       console.log("Отправляемые данные:", JSON.stringify(formData));
     
     try {
-      const response = await fetch('http://localhost:8000/predict', {
+        const response = await fetch('https://stalwart-lolly-8a721c.netlify.app/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+            body: JSON.stringify(formData),
+            mode: "cors",
       });
       if (!response.ok) {
          throw new Error('Ошибка запроса');
@@ -49,7 +50,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Прогнозирование цен на недвижимость</h1>
+        <h1>Определение цены на недвижимость</h1>
         <form onSubmit={handleSubmit} className="prediction-form">
           <div className="form-group">
             <label>Количество комнат:</label>
@@ -121,13 +122,13 @@ function App() {
           </div>
           
           <button type="submit" disabled={loading}>
-            {loading ? 'Прогнозируем...' : 'Прогнозировать цену'}
+            {loading ? 'Определяем...' : 'Определить цену'}
           </button>
         </form>
         
         {prediction !== null && (
           <div className="prediction-result">
-            <h2>Прогнозируемая цена:</h2>
+            <h2>Цена определена:</h2>
             <p>{Math.round(prediction).toLocaleString()} руб.</p>
           </div>
         )}

@@ -49,7 +49,7 @@
 }
 
 button {
-  background-color: #4CAF50;
+  background-color: #cd00cd;
   color: white;
   border: none;
   padding: 12px 20px;
@@ -60,7 +60,7 @@ button {
 }
 
 button:hover {
-  background-color: #45a049;
+  background-color: #ba5fb6;
 }
 
 button:disabled {
@@ -86,4 +86,8 @@ button:disabled {
   font-size: 24px;
   font-weight: bold;
   color: #4CAF50;
+}
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
 }
