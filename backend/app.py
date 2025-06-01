@@ -4,10 +4,14 @@ import pickle
 import numpy as np
 
 app = Flask(__name__)
-CORS(app)  # Разрешаем CORS для всех доменов
-CORS(app, resources={r"/predict": {"origins": "http://localhost:3000"}})
+CORS(app, resources={r"/predict": {
+    "origins": ["https://stalwart-lolly-8a721c.netlify.app/", 
+                "http://localhost:3000"],
+    "methods": ["POST", "OPTIONS"],
+    "allow_headers": ["Content-Type"]}}, supports_credentials=True
+     )
 
-# Загрузка модели и скейлеров
+
 with open("model.pkl", "rb") as f:
     model = pickle.load(f)
 
@@ -17,20 +21,13 @@ with open("scaler_x.pkl", "rb") as f:
 with open("scaler_y.pkl", "rb") as f:
     scaler_y = pickle.load(f)
 
-@app.route('/predict', methods=['POST'])
+@app.route('/predict', methods=['POST', 'OPTIONS'])
 def predict():
-    try:
-        # Получение данных из запроса
+    if request.method == 'OPTIONS':
+        return _build_cors_preflight_response()
+    else:
+      try:
         data = request.get_json()
-        print("[Лог бэкенда] Получены данные:", data)
-        # Валидация входных данных
-        required_fields = ['rooms', 'area', 'floor', 'total_floors', 'furniture', 'property_type']
-        if not all(field in data for field in required_fields):
-            return jsonify({'error': 'Missing required fields'}), 400
-        if not all(isinstance(data[field], (int, float)) for field in required_fields):
-            return jsonify({'error': 'Invalid data types'}), 400
-
-        # Подготовка данных для модели
         input_data = np.array([
             data['rooms'],
             data['area'],
@@ -40,25 +37,24 @@ def predict():
             data['property_type']
         ]).reshape(1, -1)
         
-        # Масштабирование
         scaled_input = scaler_x.transform(input_data)
-        
-        # Предсказание
         scaled_prediction = model.predict(scaled_input)
-        
-        # Обратное масштабирование
         prediction = scaler_y.inverse_transform(scaled_prediction.reshape(-1, 1))
-        print("Предсказание:", prediction)
         return jsonify({
             'predicted_price': round(float(prediction[0][0]), 2)
         })
-        print("[Лог бэкенда] Предсказание:", prediction)
-        return jsonify({'predicted_price': prediction})
 
-    except Exception as e:
-        print("[Лог бэкенда] Ошибка:", str(e))
-        return jsonify({'error': str(e)}), 500
-
+      except Exception as e:
+        return jsonify({
+            'error': str(e),
+            'status': 'error'
+        }),
+def _build_cors_preflight_response():
+    response = jsonify({"message": "Preflight"})
+    response.headers.add("Access-Control-Allow-Origin", "https://stalwart-lolly-8a721c.netlify.app/")
+    response.headers.add("Access-Control-Allow-Headers", "Content-Type")
+    response.headers.add("Access-Control-Allow-Methods", "POST")
+    return response
 @app.route('/')
 def home():
     return jsonify({
@@ -68,4 +64,4 @@ def home():
     })
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000, debug=True)
+    app.run(host='0.0.0.0', port=8000)

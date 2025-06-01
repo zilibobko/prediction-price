@@ -11,7 +11,8 @@ function App() {
     property_type: 0
   });
   const [prediction, setPrediction] = useState(null);
-  const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const[error, setError] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,24 +25,37 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
       setLoading(true);
-      console.log("Отправляемые данные:", JSON.stringify(formData));
+      setError(null);
     
-    try {
-        const response = await fetch('https://stalwart-lolly-8a721c.netlify.app/', {
+      try {
+        console.log("Отправляемые данные:", formData);
+          const response = await fetch('https://prediction-price-qbdl.onrender.com/predict', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-            body: JSON.stringify(formData),
-            mode: "cors",
+            body: JSON.stringify({
+                rooms: Number(formData.rooms),
+                area: Number(formData.area),
+                floor: Number(formData.floor),
+                total_floors: Number(formData.total_floors),
+                furniture: Number(formData.furniture),
+                property_type: Number(formData.property_type)
+            }),
+            mode: 'cors'
       });
       if (!response.ok) {
-         throw new Error('Ошибка запроса');
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
       const data = await response.json();
+      if (data.status === 'error') {
+              throw new Error(data.error);
+      }
       setPrediction(data.predicted_price);
     } catch (error) {
-      console.error('Error:', error);
+          console.error('Error:', error);
+          setError(error.message);
+          alert("Ошибка при отправке запроса. Проверьте консоль для деталей.");
     } finally {
       setLoading(false);
     }
