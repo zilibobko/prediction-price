@@ -29,7 +29,7 @@ function App() {
     
       try {
         console.log("Отправляемые данные:", formData);
-          const response = await fetch('https://prediction-price-qbdl.onrender.com/predict', {
+          const response = await fetch('/api/predict', { 'https://prediction-price-qbdl.onrender.com/predict' }, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
