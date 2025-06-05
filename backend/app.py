@@ -20,6 +20,13 @@ with open("scaler_x.pkl", "rb") as f:
 
 with open("scaler_y.pkl", "rb") as f:
     scaler_y = pickle.load(f)
+    
+def _build_cors_preflight_response(response):
+    response = jsonify({'message': 'Preflight'})
+    response.headers.add("Access-Control-Allow-Origin", "https://stalwart-lolly-8a721c.netlify.app")
+    response.headers.add("Access-Control-Allow-Headers", "Content-Type")
+    response.headers.add("Access-Control-Allow-Methods", "POST, OPTIONS")
+    return response
 
 @app.route('/predict', methods=['POST', 'OPTIONS'])
 def predict():
@@ -48,14 +55,7 @@ def predict():
         return jsonify({
             'error': str(e),
             'status': 'error'
-        }),
-@app.after_request
-def add_cors_headers(response):
-    response = jsonify({'message': 'Preflight'})
-    response.headers.add('Access-Control-Allow-Origin', 'https://stalwart-lolly-8a721c.netlify.app/')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
-    response.headers.add('Access-Control-Allow-Methods', 'POST, OPTIONS')
-    return response
+        }), 400
 @app.route('/')
 def home():
     return jsonify({
