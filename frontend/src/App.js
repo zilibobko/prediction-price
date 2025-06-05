@@ -42,7 +42,8 @@ function App() {
                 furniture: Number(formData.furniture),
                 property_type: Number(formData.property_type)
             }),
-            mode: 'cors'
+            mode: 'cors',
+            credentials: 'include'
       });
       if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

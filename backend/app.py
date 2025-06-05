@@ -5,10 +5,10 @@ import numpy as np
 
 app = Flask(__name__)
 CORS(app, resources={r"/predict": {
-    "origins": ["https://stalwart-lolly-8a721c.netlify.app/", 
+    "origins": ["https://stalwart-lolly-8a721c.netlify.app", 
                 "http://localhost:3000"],
     "methods": ["POST", "OPTIONS"],
-    "allow_headers": ["Content-Type"]}}, supports_credentials=True
+    "allow_headers": ["Content-Type"], "supports_credentials": True}}
      )
 
 
@@ -49,11 +49,12 @@ def predict():
             'error': str(e),
             'status': 'error'
         }),
-def _build_cors_preflight_response():
-    response = jsonify({"message": "Preflight"})
-    response.headers.add("Access-Control-Allow-Origin", "https://stalwart-lolly-8a721c.netlify.app/")
-    response.headers.add("Access-Control-Allow-Headers", "Content-Type")
-    response.headers.add("Access-Control-Allow-Methods", "POST")
+@app.after_request
+def add_cors_headers(response):
+    response = jsonify({'message': 'Preflight'})
+    response.headers.add('Access-Control-Allow-Origin', 'https://stalwart-lolly-8a721c.netlify.app/')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+    response.headers.add('Access-Control-Allow-Methods', 'POST, OPTIONS')
     return response
 @app.route('/')
 def home():
